@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trạm Quản Lý Webapp</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-danger { background: var(--danger); color: white; padding: 0.25rem 0.5rem; font-size: 0.875rem; }
+
+        /* Form Thêm Ứng Dụng */
+        .form-section {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: none; /* Ẩn mặc định */
+        }
+
+        .form-section.active { display: block; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        
+        input, select {
+            padding: 0.5rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        /* Lưới hiển thị App */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .app-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            position: relative;
+            transition: transform 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-card:hover { transform: translateY(-5px); }
+
+        .app-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+        .app-icon { font-size: 2rem; }
+        .app-title { font-size: 1.25rem; font-weight: 600; color: var(--primary); }
+        
+        .app-category {
+            align-self: flex-start;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .app-desc { color: #64748b; margin-bottom: 1.5rem; flex-grow: 1; }
+
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .link-btn {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .link-btn:hover { text-decoration: underline; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>Trạm Quản Lý Webapp</h1>
+            <p>Tất cả công cụ của bạn ở cùng một nơi</p>
+        </div>
+        <button class="btn btn-primary" onclick="toggleForm()">+ Thêm ứng dụng mới</button>
+    </div>
+
+    <!-- Khu vực nhập liệu -->
+    <div class="form-section" id="addForm">
+        <h3>Thêm Webapp Mới</h3>
+        <br>
+        <div class="form-grid">
+            <div class="input-group">
+                <label>Tên ứng dụng</label>
+                <input type="text" id="appName" placeholder="VD: Phần mềm Kế toán..." required>
+            </div>
+            <div class="input-group">
+                <label>Đường dẫn (URL)</label>
+                <input type="url" id="appUrl" placeholder="https://..." required>
+            </div>
+            <div class="input-group">
+                <label>Mô tả ngắn</label>
+                <input type="text" id="appDesc" placeholder="Dùng để làm gì?">
+            </div>
+            <div class="input-group">
+                <label>Phân loại</label>
+                <select id="appCategory">
+                    <option value="Công việc">Công việc</option>
+                    <option value="Kế toán">Kế toán</option>
+                    <option value="Công cụ IT">Công cụ IT</option>
+                    <option value="Cá nhân">Cá nhân</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Biểu tượng (Emoji)</label>
+                <input type="text" id="appIcon" placeholder="VD: 📊, 🔧, 💻" value="🌐">
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="addApp()">Lưu ứng dụng</button>
+    </div>
+
+    <!-- Khu vực hiển thị -->
+    <div class="app-grid" id="appContainer"></div>
+</div>
+
+<script>
+    // Dữ liệu mẫu ban đầu nếu chưa có gì trong LocalStorage
+    const defaultApps = [
+        { id: 1, name: "Phần mềm Kế toán", url: "https://google.com", desc: "Quản lý thu chi, báo cáo tài chính", category: "Kế toán", icon: "📊" },
+        { id: 2, name: "Tra cứu Driver & Lỗi", url: "https://google.com", desc: "Bộ công cụ chẩn đoán IT", category: "Công cụ IT", icon: "🔧" }
+    ];
+
+    // Lấy dữ liệu từ LocalStorage hoặc dùng dữ liệu mẫu
+    let apps = JSON.parse(localStorage.getItem('myWebApps'));
+    if (!apps || apps.length === 0) {
+        apps = defaultApps;
+        saveData();
+    }
+
+    // Lưu vào LocalStorage
+    function saveData() {
+        localStorage.setItem('myWebApps', JSON.stringify(apps));
+    }
+
+    // Hiển thị danh sách
+    function renderApps() {
+        const container = document.getElementById('appContainer');
+        container.innerHTML = '';
+
+        apps.forEach(app => {
+            const card = document.createElement('div');
+            card.className = 'app-card';
+            card.innerHTML = `
+                <div class="app-header">
+                    <span class="app-icon">${app.icon}</span>
+                    <span class="app-title">${app.name}</span>
+                </div>
+                <span class="app-category">${app.category}</span>
+                <p class="app-desc">${app.desc}</p>
+                <div class="card-actions">
+                    <a href="${app.url}" target="_blank" class="link-btn">Mở ngay ↗</a>
+                    <button class="btn btn-danger" onclick="deleteApp(${app.id})">Xóa</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // Mở/đóng form
+    function toggleForm() {
+        document.getElementById('addForm').classList.toggle('active');
+    }
+
+    // Thêm app mới
+    function addApp() {
+        const name = document.getElementById('appName').value;
+        const url = document.getElementById('appUrl').value;
+        const desc = document.getElementById('appDesc').value;
+        const category = document.getElementById('appCategory').value;
+        const icon = document.getElementById('appIcon').value;
+
+        if (!name || !url) {
+            alert("Vui lòng nhập Tên và URL!");
+            return;
+        }
+
+        const newApp = {
+            id: Date.now(),
+            name, url, desc, category,
+            icon: icon || "🌐"
+        };
+
+        apps.push(newApp);
+        saveData();
+        renderApps();
+        
+        // Reset form và ẩn đi
+        document.getElementById('appName').value = '';
+        document.getElementById('appUrl').value = '';
+        document.getElementById('appDesc').value = '';
+        toggleForm();
+    }
+
+    // Xóa app
+    function deleteApp(id) {
+        if (confirm("Bạn có chắc muốn xóa ứng dụng này khỏi danh sách?")) {
+            apps = apps.filter(app => app.id !== id);
+            saveData();
+            renderApps();
+        }
+    }
+
+    // Render lần đầu khi load trang
+    renderApps();
+</script>
+
+</body>
+</html>
